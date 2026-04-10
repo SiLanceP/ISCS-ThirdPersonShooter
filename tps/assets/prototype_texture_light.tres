@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cbhtrehwp61ke"]
+
+[ext_resource type="Texture2D" uid="uid://bbt1a2mymhgox" path="res://assets/floor/JPEG/Terrazo_Floor_Tiles/Terrazo_Floor_Tiles_height.jpg" id="1_kpha0"]
+
+[resource]
+albedo_texture = ExtResource("1_kpha0")
+uv1_triplanar = true
