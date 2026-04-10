@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://xmah5uy0tp86"]
 
 [ext_resource type="Script" uid="uid://bdxb8xghm6jai" path="res://scenes/player.gd" id="1_3vyb7"]
+[ext_resource type="Script" uid="uid://d1blpqld8qsf2" path="res://scenes/camera.gd" id="2_g2els"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nnsk1"]
 
@@ -13,8 +14,11 @@ script = ExtResource("1_3vyb7")
 shape = SubResource("CapsuleShape3D_nnsk1")
 debug_color = Color(0.8009589, 0.420506, 0, 0.41960785)
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1366143104]
-transform = Transform3D(1, 0, 0, 0, 0.9945219, 0.104528464, 0, -0.104528464, 0.9945219, 1, 1, 2)
-
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=75715131]
 mesh = SubResource("CapsuleMesh_rwgxs")
+
+[node name="Camera" type="Node3D" parent="." unique_id=653171947]
+script = ExtResource("2_g2els")
+
+[node name="Camera3D" type="Camera3D" parent="Camera" unique_id=1366143104]
+transform = Transform3D(1, 0, 0, 0, 0.9945219, 0.104528464, 0, -0.104528464, 0.9945219, 1, 1, 2)
