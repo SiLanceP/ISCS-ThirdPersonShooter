@@ -18,8 +18,17 @@ debug_color = Color(0.8009589, 0.420506, 0, 0.41960785)
 mesh = SubResource("CapsuleMesh_rwgxs")
 
 [node name="Camera" type="Node3D" parent="." unique_id=653171947 node_paths=PackedStringArray("character")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 script = ExtResource("2_g2els")
 character = NodePath("..")
 
-[node name="Camera3D" type="Camera3D" parent="Camera" unique_id=1366143104]
-transform = Transform3D(1, 0, 0, 0, 0.9945219, 0.104528464, 0, -0.104528464, 0.9945219, 1, 1, 2)
+[node name="EdgeSpringArm" type="SpringArm3D" parent="Camera" unique_id=670917796]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+spring_length = 0.5
+
+[node name="RearSpringArm" type="SpringArm3D" parent="Camera/EdgeSpringArm" unique_id=1286477167]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.371139e-08, 0, 1)
+spring_length = 1.5
+
+[node name="Camera3D" type="Camera3D" parent="Camera/EdgeSpringArm/RearSpringArm" unique_id=1366143104]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.03, 1.5)
