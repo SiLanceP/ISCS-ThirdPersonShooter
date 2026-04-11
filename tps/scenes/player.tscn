@@ -34,11 +34,12 @@ character = NodePath("..")
 edge_spring_arm = NodePath("EdgeSpringArm")
 rear_spring_arm = NodePath("EdgeSpringArm/RearSpringArm")
 camera = NodePath("EdgeSpringArm/RearSpringArm/Camera3D")
+aim_rear_spring_length = 0.4
+aim_edge_spring_length = 0.8
 
 [node name="EdgeSpringArm" type="SpringArm3D" parent="Camera" unique_id=670917796]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 shape = SubResource("SphereShape3D_g2els")
-spring_length = 0.5
 
 [node name="RearSpringArm" type="SpringArm3D" parent="Camera/EdgeSpringArm" unique_id=1286477167]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 1)
@@ -46,4 +47,3 @@ shape = SubResource("SphereShape3D_qhqgy")
 spring_length = 1.5
 
 [node name="Camera3D" type="Camera3D" parent="Camera/EdgeSpringArm/RearSpringArm" unique_id=1366143104]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, 1.5)
