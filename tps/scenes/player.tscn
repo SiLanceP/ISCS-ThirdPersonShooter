@@ -36,6 +36,7 @@ rear_spring_arm = NodePath("EdgeSpringArm/RearSpringArm")
 camera = NodePath("EdgeSpringArm/RearSpringArm/Camera3D")
 aim_rear_spring_length = 0.4
 aim_edge_spring_length = 0.8
+aim_fov = 40.0
 
 [node name="EdgeSpringArm" type="SpringArm3D" parent="Camera" unique_id=670917796]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
