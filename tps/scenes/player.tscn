@@ -4,10 +4,20 @@
 [ext_resource type="Script" uid="uid://d1blpqld8qsf2" path="res://scenes/camera.gd" id="2_g2els"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nnsk1"]
+radius = 0.8
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_rwgxs"]
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_g2els"]
+margin = 0.01
+radius = 0.1
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_qhqgy"]
+margin = 0.01
+radius = 0.1
+
 [node name="Player" type="CharacterBody3D" unique_id=473242358]
+collision_layer = 2
 script = ExtResource("1_3vyb7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1898214147]
@@ -24,10 +34,12 @@ character = NodePath("..")
 
 [node name="EdgeSpringArm" type="SpringArm3D" parent="Camera" unique_id=670917796]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+shape = SubResource("SphereShape3D_g2els")
 spring_length = 0.5
 
 [node name="RearSpringArm" type="SpringArm3D" parent="Camera/EdgeSpringArm" unique_id=1286477167]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.371139e-08, 0, 1)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 1)
+shape = SubResource("SphereShape3D_qhqgy")
 spring_length = 1.5
 
 [node name="Camera3D" type="Camera3D" parent="Camera/EdgeSpringArm/RearSpringArm" unique_id=1366143104]
