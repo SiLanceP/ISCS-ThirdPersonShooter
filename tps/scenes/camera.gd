@@ -12,6 +12,10 @@ extends Node3D
 @export var aim_edge_spring_length: float = .5
 @export var aim_speed: float = .2
 @export var aim_fov: float = 50
+@export var fire_rate: float = 0.1
+
+var autofire: bool = false
+var fire_timer: float = 0.0
 
 var camera_rotation: Vector2 = Vector2.ZERO
 var mouse_sensitivity: float = 0.001
@@ -78,6 +82,12 @@ func _process(delta: float) -> void:
 	if laser_visual:
 		laser_visual.visible = true
 	
+	if autofire:
+		fire_timer -= delta
+		if fire_timer <= 0.0:
+			shoot()
+			fire_timer = fire_rate
+	
 	if muzzle_node and camera_node and character_node:
 		var camera_forward = -camera_node.global_transform.basis.z
 		var camera_up = camera_node.global_transform.basis.y
@@ -103,7 +113,12 @@ func _input(event: InputEvent) -> void:
 		swap_camera_alignment()
 
 	if event.is_action_pressed("fire"):
+		autofire = true
 		shoot()
+		fire_timer = fire_rate
+	if event.is_action_released("fire"):
+		autofire = false
+		fire_timer = 0.0
 
 	if event.is_action_pressed("aim"):
 		enter_aim()
@@ -116,6 +131,9 @@ func shoot() -> void:
 
 	var projectile = projectile_scene.instantiate()
 	get_tree().current_scene.add_child(projectile)
+	
+	if character_node:
+		projectile.add_collision_exception_with(character_node)
 
 	# Set the projectile's starting position to the gun's position
 	projectile.global_transform.origin = gun_node.global_position
