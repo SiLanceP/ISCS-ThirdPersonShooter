@@ -39,6 +39,6 @@ func spawn_impact(impact_position: Vector3) -> void:
 	if not explosion_scene:
 		return
 	var impact = explosion_scene.instantiate()
-	impact.setup(0.25, 0.7, 0.3, Color(1, 0.9, 0.6, 1))
+	impact.setup(0.25, 0.5, 0.2, Color(1, 0.9, 0.6, 1))
 	get_tree().current_scene.add_child(impact)
 	impact.global_transform.origin = impact_position

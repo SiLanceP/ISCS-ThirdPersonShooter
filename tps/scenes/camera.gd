@@ -16,6 +16,7 @@ extends Node3D
 
 var autofire: bool = false
 var fire_timer: float = 0.0
+var is_aiming: bool = false
 
 var camera_rotation: Vector2 = Vector2.ZERO
 var mouse_sensitivity: float = 0.001
@@ -64,23 +65,24 @@ func _ready() -> void:
 func create_laser_sight() -> void:
 	laser_visual = MeshInstance3D.new()
 	var box_mesh = BoxMesh.new()
-	box_mesh.size = Vector3(0.02, 0.02, 80.0)
+	box_mesh.size = Vector3(0.05, 0.05, 80.0)
 	laser_visual.mesh = box_mesh
 	laser_visual.position = Vector3(0, 0, -40.0)
 	
 	var material = StandardMaterial3D.new()
-	material.albedo_color = Color(0.8, 0.1, 0.1, 0.6)
+	material.albedo_color = Color(1, 0, 0, 1)
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.emission_enabled = true
-	material.emission = Color(0.8, 0.1, 0.1, 1)
+	material.emission = Color(1, 0, 0) * 2.0
 	laser_visual.material_override = material
 	
-	if camera_node:
-		camera_node.add_child(laser_visual)
+	if gun_node:
+		gun_node.add_child(laser_visual)
+		laser_visual.position = Vector3(0, 0, -40.0)
 
 func _process(delta: float) -> void:
 	if laser_visual:
-		laser_visual.visible = true
+		laser_visual.visible = false
 	
 	if autofire:
 		fire_timer -= delta
@@ -141,12 +143,12 @@ func shoot() -> void:
 	# Calculate the direction from the gun to the crosshair, considering camera alignment
 	var viewport = get_viewport()
 	var screen_center = viewport.get_visible_rect().get_center()
-
+	
 	# Adjust the screen center based on the camera alignment (left/right POV)
 	var alignment_offset = Vector2(current_camera_alignment * 7, -16) # Adjust 20 pixels for alignment
 	var adjusted_screen_center = screen_center + alignment_offset
 
-	var ray_origin = camera_node.project_ray_origin(adjusted_screen_center)
+	var ray_origin = camera_node.project_ray_origin(adjusted_screen_center) #adjusted_screen_center
 	var ray_direction = camera_node.project_ray_normal(adjusted_screen_center)
 
 	# Determine the direction from the gun to the ray intersection
@@ -199,6 +201,7 @@ func set_rear_spring_arm_position(pos: float, speed: float) -> void:
 		camera_tween.tween_property(edge_spring_arm_node, "spring_length", pos, speed)
 
 func enter_aim() -> void:
+	is_aiming = true
 	if camera_tween:
 		camera_tween.kill()
 
@@ -213,6 +216,7 @@ func enter_aim() -> void:
 		camera_tween.tween_property(rear_spring_arm_node, "spring_length", aim_rear_spring_length, aim_speed)
 
 func exit_aim() -> void:
+	is_aiming = false
 	if camera_tween:
 		camera_tween.kill()
 

@@ -2,7 +2,7 @@ extends StaticBody3D
 
 @export var health: int = 3
 @export var hit_explosion_scene: PackedScene = preload("res://scenes/explosion.tscn")
-@export var death_explosion_scale: float = 0.9
+@export var death_explosion_scale: float = 3.0
 
 func take_damage(amount: int) -> void:
 	health -= amount
@@ -18,6 +18,6 @@ func spawn_explosion(explosion_scale: float, color: Color) -> void:
 		return
 	var target_position = global_transform.origin
 	var explosion = hit_explosion_scene.instantiate()
-	explosion.setup(0.4, explosion_scale, 0.8, color)
+	explosion.setup(0.4, explosion_scale, 0.6, color)
 	explosion.global_transform.origin = target_position
 	get_tree().current_scene.add_child(explosion)

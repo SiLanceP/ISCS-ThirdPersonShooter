@@ -9,10 +9,14 @@ func create_crosshair() -> void:
 
 	var cross = Control.new()
 	cross.name = "Crosshair"
-	cross.anchor_left = 0.5
-	cross.anchor_top = 0.5
-	cross.anchor_right = 0.5
+	cross.anchor_left   = 0.5
+	cross.anchor_top    = 0.5
+	cross.anchor_right  = 0.5
 	cross.anchor_bottom = 0.5
+	cross.offset_left   = -8   
+	cross.offset_top    = -8   
+	cross.offset_right  =  8
+	cross.offset_bottom =  80.5
 	cross.size = Vector2(16, 16)
 	cross.position = Vector2(-8, -8)
 	cross.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -31,3 +35,7 @@ func create_crosshair() -> void:
 	cross.add_child(vertical)
 	ui_layer.add_child(cross)
 	add_child(ui_layer)
+	
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("restart"): #Press R to reset the map
+		get_tree().reload_current_scene()

@@ -1,0 +1,74 @@
+[gd_scene format=3 uid="uid://cbokxdroutau8"]
+
+[ext_resource type="Material" uid="uid://cbhtrehwp61ke" path="res://assets/prototype_texture_light.tres" id="1_nnsk1"]
+[ext_resource type="PackedScene" uid="uid://xmah5uy0tp86" path="res://scenes/player.tscn" id="2_rwgxs"]
+[ext_resource type="Script" uid="uid://cookoq4xgjvoj" path="res://scenes/world.gd" id="3_0"]
+[ext_resource type="PackedScene" uid="uid://c0abdavyqxfal" path="res://scenes/target.tscn" id="4_0"]
+[ext_resource type="PackedScene" uid="uid://boclgdtnv3ai" path="res://scenes/movingtarget.tscn" id="4_71j4m"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nnsk1"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_rwgxs"]
+sky_material = SubResource("ProceduralSkyMaterial_nnsk1")
+
+[sub_resource type="Environment" id="Environment_4wyf3"]
+background_mode = 2
+sky = SubResource("Sky_rwgxs")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="World" type="Node3D" unique_id=1271022526]
+script = ExtResource("3_0")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=323176652]
+environment = SubResource("Environment_4wyf3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=333143656]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="." unique_id=1015238849]
+use_collision = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D" unique_id=783135867]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6514647, 0)
+size = Vector3(30, 7.40293, 30)
+material = ExtResource("1_nnsk1")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="CSGCombiner3D" unique_id=2050455813]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7625427, 0)
+operation = 2
+size = Vector3(29, 7.2250853, 29)
+material = ExtResource("1_nnsk1")
+
+[node name="Player" parent="." unique_id=473242358 instance=ExtResource("2_rwgxs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1895542, 0)
+
+[node name="Target" parent="." unique_id=222222222 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, -5)
+
+[node name="Target2" parent="." unique_id=222222223 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, -5)
+
+[node name="Target3" parent="." unique_id=222222224 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 5)
+
+[node name="Target4" parent="." unique_id=222222225 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 5)
+
+[node name="Target5" parent="." unique_id=222222226 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 8)
+
+[node name="Mover1" parent="." unique_id=1923445038 instance=ExtResource("4_71j4m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1, 3)
+
+[node name="Mover2" parent="." unique_id=546883061 instance=ExtResource("4_71j4m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1, -2)
+
+[node name="Mover3" parent="." unique_id=1017360330 instance=ExtResource("4_71j4m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1, -6)
+
+[node name="Mover4" parent="." unique_id=1716872421 instance=ExtResource("4_71j4m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1, 1)
