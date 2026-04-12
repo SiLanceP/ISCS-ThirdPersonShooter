@@ -8,6 +8,12 @@ radius = 0.8
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_rwgxs"]
 
+[sub_resource type="StandardMaterial3D" id="Material_gun"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gun"]
+size = Vector3(0.15, 0.12, 0.4)
+
 [sub_resource type="SphereShape3D" id="SphereShape3D_g2els"]
 margin = 0.01
 radius = 0.1
@@ -18,6 +24,7 @@ radius = 0.1
 
 [node name="Player" type="CharacterBody3D" unique_id=473242358]
 collision_layer = 2
+collision_mask = 7
 script = ExtResource("1_3vyb7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1898214147]
@@ -27,13 +34,22 @@ debug_color = Color(0.8009589, 0.420506, 0, 0.41960785)
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=75715131]
 mesh = SubResource("CapsuleMesh_rwgxs")
 
-[node name="Camera" type="Node3D" parent="." unique_id=653171947 node_paths=PackedStringArray("character", "edge_spring_arm", "rear_spring_arm", "camera")]
+[node name="Muzzle" type="Node3D" parent="." unique_id=111111111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.4, -0.4)
+
+[node name="Gun" type="MeshInstance3D" parent="Muzzle" unique_id=999999999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.37541324, -0.7851312, 0.23771027)
+material_override = SubResource("Material_gun")
+mesh = SubResource("BoxMesh_gun")
+
+[node name="Camera" type="Node3D" parent="." unique_id=653171947]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 script = ExtResource("2_g2els")
 character = NodePath("..")
 edge_spring_arm = NodePath("EdgeSpringArm")
 rear_spring_arm = NodePath("EdgeSpringArm/RearSpringArm")
 camera = NodePath("EdgeSpringArm/RearSpringArm/Camera3D")
+muzzle = NodePath("../Muzzle")
 aim_rear_spring_length = 0.4
 aim_edge_spring_length = 0.8
 aim_fov = 40.0

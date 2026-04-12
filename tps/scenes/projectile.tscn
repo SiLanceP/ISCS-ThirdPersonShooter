@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://wv5neehmev5c"]
+
+[ext_resource type="Script" uid="uid://balhpxbnh5xl2" path="res://scenes/projectile.gd" id="1_0"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_0"]
+radius = 0.1
+
+[sub_resource type="SphereMesh" id="SphereMesh_0"]
+radius = 0.1
+
+[node name="Projectile" type="CharacterBody3D" unique_id=1460152497]
+collision_layer = 4
+collision_mask = 13
+script = ExtResource("1_0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1149914815]
+shape = SubResource("SphereShape3D_0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=787712005]
+mesh = SubResource("SphereMesh_0")

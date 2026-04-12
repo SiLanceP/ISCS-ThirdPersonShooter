@@ -2,6 +2,8 @@
 
 [ext_resource type="Material" uid="uid://cbhtrehwp61ke" path="res://assets/prototype_texture_light.tres" id="1_nnsk1"]
 [ext_resource type="PackedScene" uid="uid://xmah5uy0tp86" path="res://scenes/player.tscn" id="2_rwgxs"]
+[ext_resource type="Script" uid="uid://dyh8qy5k3oj0w" path="res://scenes/world.gd" id="3_0"]
+[ext_resource type="PackedScene" uid="uid://c0abc9vyqxfal" path="res://scenes/target.tscn" id="4_0"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nnsk1"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -17,6 +19,7 @@ tonemap_mode = 2
 glow_enabled = true
 
 [node name="World" type="Node3D" unique_id=1271022526]
+script = ExtResource("3_0")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=323176652]
 environment = SubResource("Environment_4wyf3")
@@ -38,6 +41,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7625427, 0)
 operation = 2
 size = Vector3(29, 7.2250853, 29)
 material = ExtResource("1_nnsk1")
+
+[node name="Target" parent="." unique_id=222222222 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, -5)
+
+[node name="Target2" parent="." unique_id=222222223 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, -5)
+
+[node name="Target3" parent="." unique_id=222222224 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 5)
+
+[node name="Target4" parent="." unique_id=222222225 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 5)
+
+[node name="Target5" parent="." unique_id=222222226 instance=ExtResource("4_0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 8)
 
 [node name="Player" parent="." unique_id=473242358 instance=ExtResource("2_rwgxs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1895542, 0)

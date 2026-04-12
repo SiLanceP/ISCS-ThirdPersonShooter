@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c0abc9vyqxfal"]
+
+[ext_resource type="Script" uid="uid://dlwgbyj0lqq57" path="res://scenes/target.gd" id="1_0"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0"]
+size = Vector3(1, 1, 1)
+
+[node name="Target" type="StaticBody3D"]
+collision_layer = 4
+script = ExtResource("1_0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_0")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_0")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)

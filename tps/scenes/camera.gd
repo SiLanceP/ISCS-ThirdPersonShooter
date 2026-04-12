@@ -1,9 +1,11 @@
 extends Node3D
 
-@export var character: CharacterBody3D
-@export var edge_spring_arm: SpringArm3D
-@export var rear_spring_arm: SpringArm3D
-@export var camera: Camera3D
+@export var character: NodePath
+@export var edge_spring_arm: NodePath
+@export var rear_spring_arm: NodePath
+@export var camera: NodePath
+@export var muzzle: NodePath
+@export var projectile_scene: PackedScene = preload("res://scenes/projectile.tscn")
 
 @export var camera_alignment_speed: float = .18
 @export var aim_rear_spring_length: float = .5
@@ -19,12 +21,73 @@ var camera_tween: Tween
 enum CameraAlignment {LEFT = -1, RIGHT = 1, CENTRE = 0}
 var current_camera_alignment: int = CameraAlignment.RIGHT
 
-@onready var default_edge_spring_arm_length: float = edge_spring_arm.spring_length
-@onready var default_rear_spring_arm_length: float = rear_spring_arm.spring_length
-@onready var default_fov: float = camera.fov
+var default_edge_spring_arm_length: float = 0.0
+var default_rear_spring_arm_length: float = 0.0
+var default_fov: float = 0.0
+
+var character_node: CharacterBody3D
+var edge_spring_arm_node: SpringArm3D
+var rear_spring_arm_node: SpringArm3D
+var camera_node: Camera3D
+var muzzle_node: Node3D
+var gun_node: MeshInstance3D
+
+var laser_visual: MeshInstance3D
+var default_gun_x_offset: float = 0.0
 
 func _ready() -> void:
+	character_node = get_node_or_null(character) as CharacterBody3D
+	edge_spring_arm_node = get_node_or_null(edge_spring_arm) as SpringArm3D
+	rear_spring_arm_node = get_node_or_null(rear_spring_arm) as SpringArm3D
+	camera_node = get_node_or_null(camera) as Camera3D
+	muzzle_node = get_node_or_null(muzzle) as Node3D
+	
+	if muzzle_node:
+		gun_node = muzzle_node.get_node_or_null("Gun") as MeshInstance3D
+		if gun_node:
+			default_gun_x_offset = gun_node.position.x
+
+	if edge_spring_arm_node:
+		default_edge_spring_arm_length = edge_spring_arm_node.spring_length
+	if rear_spring_arm_node:
+		default_rear_spring_arm_length = rear_spring_arm_node.spring_length
+	if camera_node:
+		default_fov = camera_node.fov
+
+	create_laser_sight()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func create_laser_sight() -> void:
+	laser_visual = MeshInstance3D.new()
+	var box_mesh = BoxMesh.new()
+	box_mesh.size = Vector3(0.02, 0.02, 80.0)
+	laser_visual.mesh = box_mesh
+	laser_visual.position = Vector3(0, 0, -40.0)
+	
+	var material = StandardMaterial3D.new()
+	material.albedo_color = Color(0.8, 0.1, 0.1, 0.6)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.emission_enabled = true
+	material.emission = Color(0.8, 0.1, 0.1, 1)
+	laser_visual.material_override = material
+	
+	if camera_node:
+		camera_node.add_child(laser_visual)
+
+func _process(delta: float) -> void:
+	if laser_visual:
+		laser_visual.visible = true
+	
+	if muzzle_node and camera_node and character_node:
+		var camera_forward = -camera_node.global_transform.basis.z
+		var camera_up = camera_node.global_transform.basis.y
+		var camera_right = camera_node.global_transform.basis.x
+		
+		var offset_distance = 0.3 * current_camera_alignment
+		var muzzle_world_pos = character_node.global_transform.origin + camera_right * offset_distance + camera_up * 0.8 + camera_forward * 0.3
+		
+		muzzle_node.global_position = muzzle_world_pos
+		muzzle_node.global_transform.basis = Basis.looking_at(camera_forward, camera_up)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
@@ -39,34 +102,72 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("swap_camera_alignment"):
 		swap_camera_alignment()
 
+	if event.is_action_pressed("fire"):
+		shoot()
+
 	if event.is_action_pressed("aim"):
 		enter_aim()
 	if event.is_action_released("aim"):
 		exit_aim()
 
+func shoot() -> void:
+	if not projectile_scene or not gun_node or not camera_node:
+		return
+
+	var projectile = projectile_scene.instantiate()
+	get_tree().current_scene.add_child(projectile)
+
+	# Set the projectile's starting position to the gun's position
+	projectile.global_transform.origin = gun_node.global_position
+
+	# Calculate the direction from the gun to the crosshair, considering camera alignment
+	var viewport = get_viewport()
+	var screen_center = viewport.get_visible_rect().get_center()
+
+	# Adjust the screen center based on the camera alignment (left/right POV)
+	var alignment_offset = Vector2(current_camera_alignment * 7, -16) # Adjust 20 pixels for alignment
+	var adjusted_screen_center = screen_center + alignment_offset
+
+	var ray_origin = camera_node.project_ray_origin(adjusted_screen_center)
+	var ray_direction = camera_node.project_ray_normal(adjusted_screen_center)
+
+	# Determine the direction from the gun to the ray intersection
+	var target_position = ray_origin + ray_direction * 10000.0
+	var gun_to_target_direction = (target_position - gun_node.global_position).normalized()
+
+	# Pass the calculated direction to the projectile
+	projectile.setup(gun_to_target_direction)
+
 func camera_look(mouse_movement: Vector2) -> void:
 	camera_rotation += mouse_movement
 
 	transform.basis = Basis()
-	character.transform.basis = Basis()
+	if character_node:
+		character_node.transform.basis = Basis()
 
-	character.rotate_object_local(Vector3(0,1,0), -camera_rotation.x)
+	if character_node:
+		character_node.rotate_object_local(Vector3(0,1,0), -camera_rotation.x)
 	rotate_object_local(Vector3(1,0,0), -camera_rotation.y)
 
 	camera_rotation.y = clamp(camera_rotation.y, -max_y_rotation, max_y_rotation)
 	
 func swap_camera_alignment() -> void:
 	match current_camera_alignment:
-		
 		CameraAlignment.RIGHT:
 			set_current_camera_alignment(CameraAlignment.LEFT)
 		CameraAlignment.LEFT:
 			set_current_camera_alignment(CameraAlignment.RIGHT)
 		CameraAlignment.CENTRE:
 			return
-			
+	
+	update_gun_orientation()
 	var new_pos: float = default_edge_spring_arm_length * current_camera_alignment
 	set_rear_spring_arm_position(new_pos, camera_alignment_speed)
+
+func update_gun_orientation() -> void:
+	if gun_node:
+		var new_x = default_gun_x_offset * current_camera_alignment
+		gun_node.position.x = new_x
 
 func set_current_camera_alignment(alignment: CameraAlignment) -> void:
 	current_camera_alignment = alignment
@@ -76,7 +177,8 @@ func set_rear_spring_arm_position(pos: float, speed: float) -> void:
 		camera_tween.kill()
 
 	camera_tween = get_tree().create_tween()
-	camera_tween.tween_property(edge_spring_arm, "spring_length", pos, speed)
+	if edge_spring_arm_node:
+		camera_tween.tween_property(edge_spring_arm_node, "spring_length", pos, speed)
 
 func enter_aim() -> void:
 	if camera_tween:
@@ -84,10 +186,13 @@ func enter_aim() -> void:
 
 	camera_tween = get_tree().create_tween()
 	camera_tween.set_parallel()
-	
-	camera_tween.tween_property(camera, "fov", aim_fov, aim_speed)
-	camera_tween.tween_property(edge_spring_arm, "spring_length", aim_edge_spring_length * current_camera_alignment, aim_speed)
-	camera_tween.tween_property(rear_spring_arm, "spring_length", aim_rear_spring_length, aim_speed)
+
+	if camera_node:
+		camera_tween.tween_property(camera_node, "fov", aim_fov, aim_speed)
+	if edge_spring_arm_node:
+		camera_tween.tween_property(edge_spring_arm_node, "spring_length", aim_edge_spring_length * current_camera_alignment, aim_speed)
+	if rear_spring_arm_node:
+		camera_tween.tween_property(rear_spring_arm_node, "spring_length", aim_rear_spring_length, aim_speed)
 
 func exit_aim() -> void:
 	if camera_tween:
@@ -96,6 +201,9 @@ func exit_aim() -> void:
 	camera_tween = get_tree().create_tween()
 	camera_tween.set_parallel()
 
-	camera_tween.tween_property(camera, "fov", default_fov, aim_speed)
-	camera_tween.tween_property(edge_spring_arm, "spring_length", default_edge_spring_arm_length * current_camera_alignment, aim_speed)
-	camera_tween.tween_property(rear_spring_arm, "spring_length", default_rear_spring_arm_length, aim_speed)
+	if camera_node:
+		camera_tween.tween_property(camera_node, "fov", default_fov, aim_speed)
+	if edge_spring_arm_node:
+		camera_tween.tween_property(edge_spring_arm_node, "spring_length", default_edge_spring_arm_length * current_camera_alignment, aim_speed)
+	if rear_spring_arm_node:
+		camera_tween.tween_property(rear_spring_arm_node, "spring_length", default_rear_spring_arm_length, aim_speed)
