@@ -37,6 +37,7 @@ var camera_node: Camera3D
 var muzzle_node: Node3D
 var gun_node: MeshInstance3D
 
+var laser_pivot: Node3D
 var laser_visual: MeshInstance3D
 var default_gun_x_offset: float = 0.0
 
@@ -63,6 +64,10 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func create_laser_sight() -> void:
+	laser_pivot = Node3D.new()
+	if gun_node:
+		gun_node.add_child(laser_pivot)
+	
 	laser_visual = MeshInstance3D.new()
 	var box_mesh = BoxMesh.new()
 	box_mesh.size = Vector3(0.05, 0.05, 80.0)
@@ -76,13 +81,41 @@ func create_laser_sight() -> void:
 	material.emission = Color(1, 0, 0) * 2.0
 	laser_visual.material_override = material
 	
-	if gun_node:
-		gun_node.add_child(laser_visual)
-		laser_visual.position = Vector3(0, 0, -40.0)
+	laser_pivot.add_child(laser_visual)
+
+func get_crosshair_world_target() -> Vector3:
+	"""Cast a ray from camera through screen center and find what it hits in the world"""
+	if not camera_node:
+		return Vector3.ZERO
+	
+	var viewport = get_viewport()
+	var screen_center = viewport.get_visible_rect().get_center()
+	var ray_origin = camera_node.project_ray_origin(screen_center)
+	var ray_direction = camera_node.project_ray_normal(screen_center)
+	
+	# Use PhysicsRayQueryParameters to cast a ray in the world
+	var query = PhysicsRayQueryParameters3D.create(ray_origin, ray_origin + ray_direction * 10000.0)
+	var space_state = get_world_3d().direct_space_state
+	var result = space_state.intersect_ray(query)
+	
+	# If we hit something, aim at that point. Otherwise aim far ahead on the ray
+	if result:
+		return result.position
+	else:
+		return ray_origin + ray_direction * 10000.0
 
 func _process(delta: float) -> void:
-	if laser_visual:
-		laser_visual.visible = false
+	# Update laser sight to show where we're aiming (for debugging parallax)
+	if laser_pivot and gun_node:
+		laser_pivot.visible = true
+		
+		# Get the world point the crosshair is pointing at
+		var target_point = get_crosshair_world_target()
+		var shoot_direction = (target_point - gun_node.global_position).normalized()
+		
+		# Position the PIVOT at the gun and rotate it
+		laser_pivot.global_position = gun_node.global_position
+		laser_pivot.look_at(gun_node.global_position + shoot_direction * 80.0, Vector3.UP)
 	
 	if autofire:
 		fire_timer -= delta
@@ -128,7 +161,7 @@ func _input(event: InputEvent) -> void:
 		exit_aim()
 
 func shoot() -> void:
-	if not projectile_scene or not gun_node or not camera_node:
+	if not projectile_scene or not gun_node:
 		return
 
 	var projectile = projectile_scene.instantiate()
@@ -140,22 +173,11 @@ func shoot() -> void:
 	# Set the projectile's starting position to the gun's position
 	projectile.global_transform.origin = gun_node.global_position
 
-	# Calculate the direction from the gun to the crosshair, considering camera alignment
-	var viewport = get_viewport()
-	var screen_center = viewport.get_visible_rect().get_center()
-	
-	# Adjust the screen center based on the camera alignment (left/right POV)
-	var alignment_offset = Vector2(current_camera_alignment * 7, -16) # Adjust 20 pixels for alignment
-	var adjusted_screen_center = screen_center + alignment_offset
+	# Get the world point the crosshair is pointing at
+	var target_point = get_crosshair_world_target()
+	var gun_to_target_direction = (target_point - gun_node.global_position).normalized()
 
-	var ray_origin = camera_node.project_ray_origin(adjusted_screen_center) #adjusted_screen_center
-	var ray_direction = camera_node.project_ray_normal(adjusted_screen_center)
-
-	# Determine the direction from the gun to the ray intersection
-	var target_position = ray_origin + ray_direction * 10000.0
-	var gun_to_target_direction = (target_position - gun_node.global_position).normalized()
-
-	# Pass the calculated direction to the projectile
+	# Fire projectile toward that point
 	projectile.setup(gun_to_target_direction)
 
 func camera_look(mouse_movement: Vector2) -> void:
