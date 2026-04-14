@@ -93,12 +93,14 @@ func get_crosshair_world_target() -> Vector3:
 	var ray_origin = camera_node.project_ray_origin(screen_center)
 	var ray_direction = camera_node.project_ray_normal(screen_center)
 	
-	# Use PhysicsRayQueryParameters to cast a ray in the world
+	# cast a ray in the world
 	var query = PhysicsRayQueryParameters3D.create(ray_origin, ray_origin + ray_direction * 10000.0)
+	if character_node:
+		query.exclude = [character_node.get_rid()]
 	var space_state = get_world_3d().direct_space_state
 	var result = space_state.intersect_ray(query)
 	
-	# If we hit something, aim at that point. Otherwise aim far ahead on the ray
+	# If we hit something, aim at that point.
 	if result:
 		return result.position
 	else:

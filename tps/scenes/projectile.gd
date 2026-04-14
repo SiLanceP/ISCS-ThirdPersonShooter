@@ -7,6 +7,9 @@ extends CharacterBody3D
 var direction: Vector3 = Vector3.ZERO
 var distance_traveled: float = 0.0
 
+func _ready() -> void:
+	collision_layer = 0
+
 func setup(direction_vector: Vector3) -> void:
 	direction = direction_vector.normalized()
 	look_at_from_position(global_transform.origin, global_transform.origin + direction, Vector3.UP)
