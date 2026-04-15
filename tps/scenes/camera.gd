@@ -93,29 +93,25 @@ func get_crosshair_world_target() -> Vector3:
 	var ray_origin = camera_node.project_ray_origin(screen_center)
 	var ray_direction = camera_node.project_ray_normal(screen_center)
 	
-	# cast a ray in the world
 	var query = PhysicsRayQueryParameters3D.create(ray_origin, ray_origin + ray_direction * 10000.0)
 	if character_node:
 		query.exclude = [character_node.get_rid()]
 	var space_state = get_world_3d().direct_space_state
 	var result = space_state.intersect_ray(query)
 	
-	# If we hit something, aim at that point.
 	if result:
 		return result.position
 	else:
 		return ray_origin + ray_direction * 10000.0
 
 func _process(delta: float) -> void:
-	# Update laser sight to show where we're aiming (for debugging parallax)
 	if laser_pivot and gun_node:
 		laser_pivot.visible = true
 		
-		# Get the world point the crosshair is pointing at
+		# Crosshair is the world point
 		var target_point = get_crosshair_world_target()
 		var shoot_direction = (target_point - gun_node.global_position).normalized()
 		
-		# Position the PIVOT at the gun and rotate it
 		laser_pivot.global_position = gun_node.global_position
 		laser_pivot.look_at(gun_node.global_position + shoot_direction * 80.0, Vector3.UP)
 	
@@ -172,14 +168,11 @@ func shoot() -> void:
 	if character_node:
 		projectile.add_collision_exception_with(character_node)
 
-	# Set the projectile's starting position to the gun's position
 	projectile.global_transform.origin = gun_node.global_position
 
-	# Get the world point the crosshair is pointing at
 	var target_point = get_crosshair_world_target()
 	var gun_to_target_direction = (target_point - gun_node.global_position).normalized()
 
-	# Fire projectile toward that point
 	projectile.setup(gun_to_target_direction)
 
 func camera_look(mouse_movement: Vector2) -> void:
