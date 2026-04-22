@@ -12,7 +12,7 @@ extends Node3D
 @export var aim_edge_spring_length: float = .5
 @export var aim_speed: float = .2
 @export var aim_fov: float = 50
-@export var fire_rate: float = 0.1
+@export var fire_rate: float = 0.2
 
 var autofire: bool = false
 var fire_timer: float = 0.0
